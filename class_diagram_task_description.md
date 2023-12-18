@@ -62,4 +62,3 @@
 Видимость атрибутов и классов указана
 
 ![Решение](http://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.githubusercontent.com/denmaloyreb/netology/main/class_diag.iuml)
-
