@@ -3,7 +3,6 @@ class           Tree {
   # colorsRange[]: String
   # age: int
   # rings: int
-  # rings: int
   # coreDiameter: int
   leafOut(): void
 }
