@@ -1,0 +1,52 @@
+@startuml
+class           Tree {
+  # colorsRange[]: String
+  # age: int
+  # rings: int
+  # rings: int
+  # coreDiameter: int
+  leafOut(): void
+}
+class           Human {
+  + bloodGroup: enum
+  + fingers: int
+  + speak(): void
+  + maintainLifePlants()
+  + sleep():void
+}
+
+class           Leaf{
+  - veins: int
+  - photosynthesise()
+}
+
+class           Root{
+  - systemLength: int
+  - absorbSubstances()
+}
+
+class           Birch{
+  # colorsRange[]: String
+
+}
+
+class           Trunk {
+  - transmittingSubstancesCrohn()
+
+}
+
+class           Woodpecker {
+  # beakLength: int
+  # fingers: int
+  # sleep():void
+  # eatParasites()
+}
+
+
+Tree <|-- Birch
+Tree *-- Trunk
+Tree *-- Root
+Tree *-- Leaf
+Woodpecker "0..*" - "0..1" Tree: живет в
+Human "0..*" - "1" Tree: высаживает >
+@enduml
