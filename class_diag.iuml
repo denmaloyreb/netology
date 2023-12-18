@@ -48,5 +48,5 @@ Tree *-- Trunk
 Tree *-- Root
 Tree *-- Leaf
 Woodpecker "0..*" - "0..1" Tree: живет в
-Human "0..*" - "1" Tree: высаживает >
+Human "1" - "0..*" Tree: высаживает >
 @enduml
