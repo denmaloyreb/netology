@@ -61,5 +61,5 @@
 Множественность указана корректно
 Видимость атрибутов и классов указана
 
-![Решение](https://github.com/denmaloyreb/netology/blob/main/class_diagram.wsd)
+![Решение](https://github.com/denmaloyreb/netology/blob/main/class_diag.iuml)
 
