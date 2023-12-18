@@ -47,6 +47,6 @@ Tree <|-- Birch
 Tree *-- Trunk
 Tree *-- Root
 Tree *-- Leaf
-Woodpecker "0..*" - "0..1" Tree: живет в
-Human "0..*" - "1" Tree: высаживает >
+Woodpecker "0..*" - "0..1" Tree: lives in
+Human "1" - "0..*" Tree: planting >
 @enduml
