@@ -1,0 +1,52 @@
+@startuml
+
+left to right direction
+
+skinparam rectangle {
+BorderColor black
+}
+
+:Арендодатель: as Landlord
+:Съемщик: as Remover
+:Модератор: as Moderator
+:Пользователь: as User
+
+rectangle  Сервис\nаренды {
+usecase (Заблокировать\nпользователя\nв сервисе) as BlockUser
+usecase (Выбрать\nпривязанную\nкарту) as ChooseCard
+usecase (Добавить\nсвой\nаватар) as AddAvatar
+usecase (Подать\nжалобу\nна пользователя) as CreateAbuse
+usecase (Посмотреть\nисторию чата\nс пользователем) as SeeChatStory
+usecase (Заполнить\nтекстовое поле) as FillTextInput
+usecase (Написать отзыв\nо пользователе) as WriteRewiewUser
+usecase (Запросить удержание\nзалога с обоснованием) as RequestDeposit
+usecase (Оплатить проживание) as PayLiving
+usecase (Загрузить файл\nна сервис) as UploadFile
+}
+
+User <|-- Remover
+User <|-- Landlord
+
+User -left- AddAvatar
+User -- WriteRewiewUser
+User -- SeeChatStory
+
+Remover -- PayLiving
+ChooseCard .> PayLiving : <<extends>>
+ChooseCard .> RequestDeposit : <<extends>>
+
+Landlord -- RequestDeposit
+
+BlockUser -- Moderator
+SeeChatStory -- Moderator
+
+CreateAbuse .> WriteRewiewUser : <<extends>>
+
+WriteRewiewUser .> FillTextInput : <<include>>
+CreateAbuse .> FillTextInput : <<include>>
+
+UploadFile .> WriteRewiewUser : <<extends>>
+AddAvatar .> UploadFile : <<include>>
+
+SeeChatStory .> BlockUser : <<extends>>
+@enduml
