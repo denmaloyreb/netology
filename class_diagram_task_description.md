@@ -61,4 +61,8 @@
 Множественность указана корректно
 Видимость атрибутов и классов указана
 
+```plantuml
+!include https://github.com/denmaloyreb/netology/blob/main/class_diag.iuml
+```
+
 ![Решение](http://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.githubusercontent.com/denmaloyreb/netology/main/class_diag.iuml)
