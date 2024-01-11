@@ -1,0 +1,42 @@
+@startuml
+
+state "Предложено" as Suggested
+' state "Первыичный\n анализ" as Analys
+state "Разработка" as Develop
+state "Подготовлено" as Prepared : Подготовка к\n разработке
+state "Одобрено" as Approved
+state "Реализовано" as Realised
+state "Проверено" as Checked : Проверено на актуальность\n и реализуемость
+state "Отложено" as Postponed : Првоерка на актуальность\n через время N
+state "Удалено" as Deletted
+state "Отклонено" as Rejected
+
+state c <<choice>>
+state c2 <<choice>>
+state c3 <<choice>>
+
+[*] --> Suggested
+Suggested --> Checked
+Checked --> c
+c --> Approved : [Требование акутально\n и реализуемо]
+c --> Rejected : [Требование неактально\n для продукта\n или нереализуемо]
+Rejected --> Deletted
+Deletted --> [*]
+
+Approved --> Prepared
+Prepared --> c2
+
+c2 --> Postponed : [Требование приоритеное\n или есть ресурсы\n на него]
+c2 --> Develop : [Требование\n не приоритеное]
+
+Develop --> Realised
+Realised --> [*]
+
+Postponed --> c3
+
+c3 --> Develop : [Освободились ресурсы\n или сменился приоритет]
+c3 --> Postponed : [Ресурсы не освободились\n или сменился приоритет]
+c3 --> Rejected : [Требование потеряло актуальность\n или стало нереализуемым]
+
+
+@enduml

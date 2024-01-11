@@ -1,0 +1,77 @@
+@startuml
+
+left to right direction
+
+skinparam rectangle {
+BorderColor black
+}
+
+:Пользователь: as User
+
+rectangle  Печать\nфото {
+usecase (Выбрать фото для печати) as ChoosePhoto
+usecase (Выбрать количество фото для печати) as ChooseQuantity
+usecase (Напечатать фото из Instagram) as PrintFromInstagram
+usecase (Выбрать фото в Instagram) as ChooseInstagram
+usecase (Указать логин в Instagram) as LoginInstagram
+usecase (Закрыть страницу в Instagram) as CloseInstagram
+usecase (Напечатать фото с телефона) as PrintFromPhone
+usecase (Загрузить фото с телефона) as LoadFromPhone
+usecase (Подключить телефон через проводной интерфейс) as LoadUSB
+usecase (Извлечь провод, забрать телефон) as PickUpPhone
+usecase (Оплатить печать) as PayPrinting
+usecase (Оплатить печать по карте через терминал) as PayByCard
+usecase (Получить напечатанные фото) as RecivePhotos
+
+}
+
+User -left- PrintFromInstagram
+User -- PrintFromPhone
+User -- RecivePhotos
+User -- CloseInstagram
+User -- PickUpPhone
+
+PrintFromInstagram ..> LoginInstagram : <<include>>
+PrintFromInstagram ..> ChooseInstagram : <<include>>
+CloseInstagram .> PrintFromInstagram : <<extends>>
+PrintFromInstagram .> ChooseQuantity : <<include>>
+PrintFromInstagram ..> PayPrinting : <<include>>
+
+PrintFromPhone .> ChooseQuantity : <<include>>
+PrintFromPhone ..> LoadUSB : <<include>>
+PrintFromPhone ..> LoadFromPhone : <<include>>
+PrintFromPhone .> ChoosePhoto : <<include>>
+PrintFromPhone .> PayPrinting : <<include>>
+
+PickUpPhone .> PrintFromPhone : <<extends>>
+
+PayPrinting .> PayByCard : <<include>>
+' User <|-- Remover
+' User <|-- Landlord
+
+' User -left- AddAvatar
+' User -- WriteRewiewUser
+' User -- SeeChatStory
+
+' Remover -- PayLiving
+' ChooseCard .> PayLiving : <<extends>>
+' ChooseCard .> RequestDeposit : <<extends>>
+
+' Landlord -- RequestDeposit
+
+' BlockUser -- Moderator
+' SeeChatStory -- Moderator
+
+' CreateAbuse .> WriteRewiewUser : <<extends>>
+
+' WriteRewiewUser .> FillTextInput : <<include>>
+' CreateAbuse .> FillTextInput : <<include>>
+
+' UploadFile .> WriteRewiewUser : <<extends>>
+' AddAvatar .> UploadFile : <<include>>
+
+' SeeChatStory .> BlockUser : <<extends>>
+@enduml
+
+
+
