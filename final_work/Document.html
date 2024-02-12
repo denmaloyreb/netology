@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<!-- saved from url=(0036)https://letsdocode.ru/sql-main/total -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        table {
+            width: 150px;
+            border-collapse: collapse;
+            border: 2px solid white;
+            font-size: 20px;
+        }
+        td {
+            padding: 3px;
+            border: 1px solid ;
+            text-align: left;
+        }
+        div {
+            font-size: 20px;
+            padding-bottom: 5px;
+        }
+    </style>
+<meta name="Reverso extension" content="3.3.274" id="Reverso_extension___elForCheckedInstallExtension"></head>
+<body>
+<div><h3>Данные:</h3></div>
+<div>Ссылка на резервную копию в формате *.backup: <a href="https://letsdocode.ru/sql-main/avia.backup">avia.backup</a>. Восстанавливаете, как и предыдущие данные, согласно "Инструкции по установке ПО".</div>
+<div>В облачной базе данных работаете с базой даных <b>total</b> и схемой <b>bookings</b>. Доступ только на чтение, все необходимые модули установлены. </div>
+
+<div><h3>Описание БД:</h3></div>
+<div>Ссылка на описание демонстрационной базы данных: <a href="https://edu.postgrespro.ru/bookings.pdf" target="_blank">"Авиаперевозки"</a>.</div>
+
+<div><h3>Задания:</h3></div>
+<div>
+1. Выведите название самолетов, которые имеют менее 50 посадочных мест?
+</div>
+<div>
+2. Выведите процентное изменение ежемесячной суммы бронирования билетов, округленной до сотых.
+</div>
+<div>
+3. Выведите названия самолетов не имеющих бизнес - класс. Решение должно быть через функцию array_agg.
+</div>
+<div>
+4. Вывести накопительный итог количества мест в самолетах по каждому аэропорту на каждый день, учитывая только те самолеты, которые летали пустыми и только те дни, где из одного аэропорта таких самолетов вылетало более одного.<br>
+     В результате должны быть код аэропорта, дата, количество пустых мест в самолете и накопительный итог.
+</div>
+<div>
+5. Найдите процентное соотношение перелетов по маршрутам от общего количества перелетов.<br>
+     Выведите в результат названия аэропортов и процентное отношение.<br>
+     Решение должно быть через оконную функцию.
+</div>
+<div>
+6. Выведите количество пассажиров по каждому коду сотового оператора, если учесть, что код оператора - это три символа после +7
+</div>
+<div>
+7. Классифицируйте финансовые обороты (сумма стоимости перелетов) по маршрутам:<br>
+     До 50 млн - low<br>
+     От 50 млн включительно до 150 млн - middle<br>
+     От 150 млн включительно - high<br>
+     Выведите в результат количество маршрутов в каждом полученном классе
+</div>
+<div>
+8. Вычислите медиану стоимости перелетов, медиану размера бронирования и отношение медианы бронирования к медиане стоимости перелетов, округленной до сотых
+</div>
+<div>
+9. Найдите значение минимальной стоимости полета 1 км для пассажиров. То есть нужно найти расстояние между аэропортами и с учетом стоимости перелетов получить искомый результат<br>
+      Для поиска расстояния между двумя точками на поверхности Земли используется модуль <a href="https://postgrespro.ru/docs/postgresql/16/earthdistance" target="_blank">earthdistance</a>.<br>
+      Для работы модуля <b>earthdistance</b> необходимо предварительно установить модуль <a href="https://postgrespro.ru/docs/postgresql/16/cube" target="_blank">cube</a>.<br>
+      Установка модулей происходит через команду: <b>create extension название_модуля</b>.
+</div>
+
+<div><h3>Пояснения:</h3></div>
+<div><b>Перелет, рейс</b> - разовое перемещение самолета из аэропорта А в аэропорт Б.</div>
+<div><b>Маршрут</b> - формируется двумя аэропортами А и Б. При этом А - Б и Б - А - это разные маршруты.</div>
+<div>Для решения заданий 8 и 9 необходимо самостоятельно использовать Документацию к PostgreSQL, так как в решении используются функции, которые не проходили в рамках обучения.</div>
+
+<div><h3>Баллы:</h3></div>
+<table>
+    <tbody><tr>
+        <th>Задание</th>
+        <th>Баллы</th>
+    </tr>
+    <tr>
+        <td>1</td>
+        <td>10</td>
+    </tr>
+    <tr>
+        <td>2</td>
+        <td>25</td>
+    </tr>
+    <tr>
+        <td>3</td>
+        <td>15</td>
+    </tr>
+    <tr>
+        <td>4</td>
+        <td>35</td>
+    </tr>
+    <tr>
+        <td>5</td>
+        <td>20</td>
+    </tr>
+    <tr>
+        <td>6</td>
+        <td>15</td>
+    </tr>
+    <tr>
+        <td>7</td>
+        <td>20</td>
+    </tr>
+    <tr>
+        <td>8</td>
+        <td>25</td>
+    </tr>
+    <tr>
+        <td>9</td>
+        <td>35</td>
+    </tr>
+</tbody></table>
+
+<div>
+    Максимальное количество баллов - <b>200</b>.
+    Для зачета нужно набрать минимум <b>130 баллов</b>.
+</div>
+
+<div><h3>Результат работы:</h3></div>
+<div>На проверку необходимо отправить <b>один sql файл со всеми отформатированными запросами</b>.</div>
+<div>В противном случае работа без проверки будет отправлена на доработку.</div>
+
+<div><h3>Важно:</h3></div>
+<div>
+    Все решения проходят проверку на плагиат.<br>
+    В том случае, если использовались решения взятые из других работ, то проверяющий эксперт выдает дополнительные задания.<br>
+    В случает отказа от выполнения дополнительных заданий или  повторном использовании чужих решений по работе проставляется оценка "незачет" без права пересдачи.
+</div>
+
+<script defer="" src="./Document_files/v84a3a4012de94ce1a686ba8c167c359c1696973893317" integrity="sha512-euoFGowhlaLqXsPWQ48qSkBSCFs3DPRyiwVu3FjR96cMPx+Fr+gpWRhIafcHwqwCqWS42RZhIudOvEI+Ckf6MA==" data-cf-beacon="{&quot;rayId&quot;:&quot;854370fd598e70d3&quot;,&quot;r&quot;:1,&quot;version&quot;:&quot;2024.2.0&quot;,&quot;token&quot;:&quot;1c0c818f4fcd4bc889a2d8b152da809f&quot;}" crossorigin="anonymous"></script>
+
+
+<deepl-input-controller><template shadowrootmode="open"><link rel="stylesheet" href="chrome-extension://cofdbpoegempjloogbagkncekinflcnj/build/content.css"><div><div class="dl-input-translation-container svelte-ju4595"><div></div></div></div></template></deepl-input-controller></body></html>

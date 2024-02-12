@@ -99,9 +99,22 @@ limit 3
 --во второй колонке должно быть значение, указанное после @.
 
 
+select  split_part(email, '@', 1) AS Юзернейм,
+    	split_part(email, '@', 2) AS Почтовый_домен
+from customer
 
 
 
 --ЗАДАНИЕ №4
 --Доработайте запрос из предыдущего задания, скорректируйте значения в новых колонках: 
 --первая буква строки должна быть заглавной, остальные строчными.
+
+SELECT 
+    concat(upper(substring(Юзернейм, 1, 1)), lower(substring(Юзернейм, 2))) AS Юзернейм,
+    concat(upper(substring(Почтовый_домен, 1, 1)), lower(substring(Почтовый_домен, 2))) AS Почтовый_домен
+FROM (
+    SELECT 
+        split_part(email, '@', 1) AS Юзернейм,
+        split_part(email, '@', 2) AS Почтовый_домен
+    FROM customer
+) AS subquery
