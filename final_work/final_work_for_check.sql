@@ -13,8 +13,6 @@ on a.aircraft_code = s.aircraft_code
 group by a.aircraft_code
 having COUNT(s.seat_no) < 50
 
-
-
 --2. Выведите процентное изменение ежемесячной суммы бронирования билетов, округленной до сотых.
 
 --Способ 1
@@ -67,8 +65,6 @@ having not 'Business' = any(array_agg(distinct s.fare_conditions))
 
 --4. Вывести накопительный итог количества мест в самолетах по каждому аэропорту на каждый день, учитывая только те самолеты, которые летали пустыми и только те дни, где из одного аэропорта таких самолетов вылетало более одного.
 --В результате должны быть код аэропорта, дата, количество пустых мест в самолете и накопительный итог.
-
--- вывести: код аэр, дату, кол-во мест пустых, нкаопительный итог
 
 --(не совсем понятно задание, поэтому 2 варианта вывода)
 --вариант 1
@@ -282,75 +278,3 @@ a2.arrival_airport as "Аэропорт_прилета",
 earth_distance(ll_to_earth(distance1.latitude, distance1.longitude), ll_to_earth(distance2.latitude, distance2.longitude))/100 AS "Дистанция_км", 
 min_amount.maa/(earth_distance(ll_to_earth(distance1.latitude, distance1.longitude), ll_to_earth(distance2.latitude, distance2.longitude))/100) as "Мин_ стоимость_1км(руб)" 
 from min_amount, a2, distance1, distance2
-
-
---------------------------------------------------------------------------------------------------------------
-
--- Задание	Возможные баллы 15/15 + 10/25 + 25/50 + 25/75 + 35/110 + 20/130 +15/145 + 20/165
--- 1	10 +
--- 2	25 +
--- 3	15 +
--- 4	35
--- 5	20 +
--- 6	15 +
--- 7	20 +
--- 8	25 + 
--- 9	35 +
-
----Вспомогательные звапросы!!!! -- Просьба не проверять!!!
-
-SELECT f.*
-FROM flights_v f
-WHERE f.departure_city = 'Екатеринбург'
-AND f.arrival_city = 'Москва'
-AND f.scheduled_departure > bookings.now()
-ORDER BY f.scheduled_departure
-LIMIT 1
-
--- Процентное изменение = ((Сумма в текущем месяце - Сумма в первом месяце) / Сумма в первом месяце) * 100
-
-SELECT 
-    SUM(total_amount) AS months_amount
-FROM 
-    bookings
-WHERE 
-    EXTRACT(YEAR FROM book_date) = 2016
-    AND EXTRACT(MONTH FROM book_date) = 10
- 
--- 1572450600
- -- 13128856900
--- 6065673400
-
-select extract(month from b.book_date) as "Месяц",
-           extract(YEAR from b.book_date) as "Год",
-           SUM(b.total_amount) as "Cумма_бронирования_за_месяц",
-           LAG(SUM(b.total_amount)) over (order by extract(YEAR from b.book_date), extract(month from b.book_date)) as "Предыдущая_сумма"
-    from bookings b
-    group by extract(MONTH from b.book_date), extract(YEAR from b.book_date)
-
-
-select
-PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY b.total_amount) AS "Медиана"
-from bookings b
-
-select airport_name, longitude, latitude 
-from airports a 
-
-
-SELECT earth_distance(ll_to_earth(40.748817, -73.985428), ll_to_earth(37.774929, -122.419418)) AS distance
-
-SELECT 
-    a1.airport_code AS air1,
-    a1.airport_name AS air_name1,
-    a2.airport_code AS air2,
-    a2.airport_name AS air_name2,
-    earth_distance(ll_to_earth(a1.latitude, a1.longitude), ll_to_earth(a2.latitude, a2.longitude)) AS distance
-FROM 
-    airports AS a1
-CROSS JOIN 
-    airports AS a2
-WHERE 
-    a1.airport_code <> a2.airport_code
-order by distance
-
-
