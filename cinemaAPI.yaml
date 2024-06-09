@@ -1,0 +1,313 @@
+openapi: 3.0.0
+info:
+  description: |
+    API кинотеатра «Искорка».</br>
+    API для работы с онлайн-расписанием и онлайн-продажей билетов сеансы.
+  version: "1.0.0"
+  title: Кинотеатр «Искорка»
+  contact:
+    email: denmaloyreb@mail.ru
+servers:
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/denmaloyrebDen/cinema/1.0.0
+  - url: 'https://app.swaggerhub.com/apis/denmaloyrebDen/cinema/1.0.0'
+tags:
+  - name: schedule
+    description:  Методы для работы с распиcанием
+  - name: bookings
+    description: Методы для работы с бронированиями
+paths:
+  /schedule:
+    get:
+      tags:
+        - schedule
+      summary: Получить расписание кинотеатра
+      description: Метод для получения расписания кинотеатра
+      operationId: getSchedule
+      parameters:
+        - name: sortBy
+          in: query
+          description: Поле для сортировки
+          required: false
+          schema:
+            type: string
+            enum:
+            - id
+            - title
+            - scheduleTime
+            default: id
+        - name: sortDir
+          in: query
+          description: Направление сортировки
+          required: false
+          schema:
+            type: string
+            enum:
+            - ASC
+            - DESC
+            default: ASC
+        - name: limit
+          in: query
+          description: Количество сеансов на одной странице (для пагинации)
+          required: false
+          schema:
+            type: integer
+            default: 10
+        - name: offset
+          in: query
+          description: Cмещение от начала списка (для пагинации)
+          required: false
+          schema:
+            type: integer
+            default: 1
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    description: Расписание
+                    items: 
+                      $ref: '#/components/schemas/Schedule'
+                  itemsCount:
+                    type: integer
+                    format: int64
+                    description: Количество сеансов в ответе
+                  totalItemsCount:
+                    type: integer
+                    format: int64
+                    description: Общее количество сеансов в расписании
+                  offset:
+                    type: integer
+                    format: int64
+                    description: Cмещение от начала списка сеансов
+        '404':
+          description: Расписание не найдено
+  /schedule/{scheduleId}/seats:
+    get:
+      tags:
+        - schedule
+      summary: Узнать наличие мест на сеанс
+      description: Метод для получения мнформации о наличии мест на сеанс
+      operationId: getScheduleSeatsByID
+      parameters:
+        - name: scheduleId
+          in: path
+          description: Идентификатор сеанса
+          required: true
+          schema:
+            type: string
+            default: 123
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  freeSeatsCount:
+                    type: integer
+                    format: int64
+                    description: Количество свободных мест на сеанс
+                  seats:
+                    type: array
+                    description: Информация о местах
+                    items:
+                      $ref: '#/components/schemas/Seat'
+        '404':
+          description: Сеанс не найден 
+        '405':
+          description: Invalid input
+  /schedule/{scheduleId}/scheduleTime:
+    patch:
+      tags:
+        - schedule
+      summary: Изменить время сеанса
+      description: Метод для изменения врмени начала сеанса  по его идентификатору
+      operationId: changeScheduleTimeById
+      parameters:
+        - name: scheduleId
+          in: path
+          description: Идентификатор сеанса
+          required: true
+          schema:
+            type: string
+        - name: newScheduleTime
+          in: query
+          description: Новое время начала сеанса
+          required: true
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScheduleInfo'
+        '404':
+          description: Сеанс не найден
+  /bookings:
+    post:
+      tags:
+        - bookings
+      summary: Забронировать место/места
+      description: Метод для бронирования мест по идентификатору сеанса
+      operationId: bookSeatByScheduleId
+      parameters:
+        - name: scheduleId
+          in: query
+          description: Идентификатор сеанса
+          required: true
+          schema:
+            type: string
+        - name: bookingSeats
+          in: query
+          description: Массив идентификаторов мест для бронирования
+          required: true
+          schema:
+            type: array
+            items:
+              type: integer
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/bookingInfo'
+  /bookings/{bookingId}:
+    delete:
+      tags:
+        - bookings
+      summary: Отменить бронь
+      description: Метод для отмены брони по ее идентификатору
+      operationId: deleteBookingById
+      parameters:
+        - name: bookingId
+          in: path
+          description: Идентификатор бронирования
+          required: true
+          schema:
+            type: string
+            example: 123
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  bookingId:
+                    type: integer
+                    description: Идентификатор бронирования
+                    format: int64
+                  bookingStatus:
+                    type: string
+                    description: Статус бронирования
+                    example: Бронь отменена
+        '404':
+          description: Бронь не найдена
+components:
+  schemas:
+    bookingInfo:
+      type: object
+      properties:
+        bookingId:
+          type: integer
+          description: Идентификатор бронирования
+          format: int64
+        bookingStatus:
+          type: string
+          description: Cтатус бронирования
+          example: Оплачено 
+        scheduleId:
+          type: integer
+          description: Идентификатор сеанса
+          format: int64
+        title:
+          type: string
+          description: Название фильма
+          example: Рэмбо, первая кровь
+        description:
+          type: string
+          description: Описание фильма
+          example: Джон Рэмбо навалял всем
+        scheduleTime:
+          type: string
+          format: date-time
+          description: Дата и время сеанса
+        bookingSeats:
+          type: array
+          items:
+            type: integer
+          description: Массив номеров забронированных мест на сеанс
+        totalPrice:
+          type: string
+          description: Стоимость бронирования
+    Schedule:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Идентификатор сеанса
+          format: int64
+        title:
+          type: string
+          description: Название фильма
+          example: Рэмбо, первая кровь
+        description:
+          type: string
+          description: Описание фильма
+          example: Джон Рэмбо навалял всем
+        seats:
+          type: array
+          items:
+            $ref: '#/components/schemas/Seat'
+        freeSeatsCount:
+          type: integer
+          format: int64
+          description: Количество свободных мест
+        scheduleTime:
+          type: string
+          format: date-time
+          description: Дата и время сеанса 
+    Seat:
+      type: object
+      properties:
+        seatsNumber:
+          type: integer
+          format: int64
+          description: Номер места
+        isFree:
+          type: boolean
+          description: Флаг доступности места
+        price:
+          type: string
+          description: Стоимость места
+    ScheduleInfo:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Идентификатор сеанса
+          format: int64
+        title:
+          type: string
+          description: Название фильма
+          example: Рэмбо, первая кровь
+        description:
+          type: string
+          description: Описание фильма
+          example: Джон Рэмбо навалял всем
+        scheduleTime:
+          type: string
+          format: date-time
+          description: Дата и время сеанса 

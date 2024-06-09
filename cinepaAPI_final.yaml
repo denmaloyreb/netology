@@ -1,0 +1,752 @@
+openapi: 3.0.0
+info:
+  description: |
+    API кинотеатра «Искорка».</br>
+    API для работы с онлайн-расписанием, онлайн-продажей билетов сеансы и бонусной программой.
+  version: '1'
+  title: Кинотеатр «Искорка c бонусной программой»
+  contact:
+    email: denmaloyreb@mail.ru
+servers:
+  # Added by API Auto Mocking Plugin
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/DENMALOYREB3/cinema3/1
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/DENMALOYREB3/cinema2/1.0.0
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/denmaloyrebDen/cinema/1.0.0
+  - url: 'https://app.swaggerhub.com/apis/denmaloyrebDen/cinema/1.0.0'
+tags:
+  - name: schedule
+    description:  Методы для работы с распиcанием
+  - name: bookings
+    description: Методы для работы с бронированиями
+  - name: bonusProgram
+    description: Методы для работы с бонусной программой
+paths:
+  /schedule:
+    get:
+      tags:
+        - schedule
+      summary: Получить расписание кинотеатра
+      description: Метод для получения расписания кинотеатра
+      operationId: getSchedule
+      parameters:
+        - name: sortBy
+          in: query
+          description: Поле для сортировки
+          required: false
+          schema:
+            type: string
+            enum:
+            - id
+            - title
+            - scheduleTime
+            default: id
+        - name: sortDir
+          in: query
+          description: Направление сортировки
+          required: false
+          schema:
+            type: string
+            enum:
+            - ASC
+            - DESC
+            default: ASC
+        - name: limit
+          in: query
+          description: Количество сеансов на одной странице (для пагинации)
+          required: false
+          schema:
+            type: integer
+            default: 10
+        - name: offset
+          in: query
+          description: Cмещение от начала списка (для пагинации)
+          required: false
+          schema:
+            type: integer
+            default: 1
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    description: Расписание
+                    items: 
+                      $ref: '#/components/schemas/Schedule'
+                  itemsCount:
+                    type: integer
+                    format: int64
+                    description: Количество сеансов в ответе
+                  totalItemsCount:
+                    type: integer
+                    format: int64
+                    description: Общее количество сеансов в расписании
+                  offset:
+                    type: integer
+                    format: int64
+                    description: Cмещение от начала списка сеансов
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ScheduleXML'
+        '404':
+          description: Расписание не найдено
+        '500':
+          description: Internal Server Error
+  /schedule/{scheduleId}/seats:
+    get:
+      tags:
+        - schedule
+      summary: Узнать наличие мест на сеанс
+      description: Метод для получения мнформации о наличии мест на сеанс
+      operationId: getScheduleSeatsByID
+      parameters:
+        - name: scheduleId
+          in: path
+          description: Идентификатор сеанса
+          required: true
+          schema:
+            type: string
+            default: 123
+        - name: limit
+          in: query
+          description: Количество ответов на одной странице (для пагинации)
+          required: false
+          schema:
+            type: integer
+            default: 5
+        - name: offset
+          in: query
+          description: Cмещение от начала списка (для пагинации)
+          required: false
+          schema:
+            type: integer
+            default: 1
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  freeSeatsCount:
+                    type: integer
+                    format: int64
+                    description: Количество свободных мест на сеанс
+                  totalItemsCount:
+                    type: integer
+                    format: int64
+                    description: Общее количество мест в зале
+                  offset:
+                    type: integer
+                    format: int64
+                    description: Cмещение от начала списка мест
+                  seats:
+                    type: array
+                    description: Информация о местах
+                    items:
+                      $ref: '#/components/schemas/Seat'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/SeatsXML'
+        '404':
+          description: Сеанс не найден 
+        '405':
+          description: Invalid input
+        '500':
+          description: Internal Server Error
+  /schedule/{scheduleId}/scheduleTime:
+    patch:
+      tags:
+        - schedule
+      summary: Изменить время сеанса
+      description: Метод для изменения времени начала сеанса  по его идентификатору
+      operationId: changeScheduleTimeById
+      parameters:
+        - name: scheduleId
+          in: path
+          description: Идентификатор сеанса
+          required: true
+          schema:
+            type: string
+        - name: newScheduleTime
+          in: query
+          description: Новое время начала сеанса
+          required: true
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScheduleInfo'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ScheduleInfo'
+        '404':
+          description: Сеанс не найден
+        '500':
+          description: Internal Server Error
+  /bookings:
+    post:
+      tags:
+        - bookings
+      summary: Забронировать место/места
+      description: Метод для бронирования мест по идентификатору сеанса
+      operationId: bookSeatByScheduleId
+      parameters:
+        - name: scheduleId
+          in: query
+          description: Идентификатор сеанса
+          required: true
+          schema:
+            type: string
+        - name: bookingSeats
+          in: query
+          description: Массив идентификаторов мест для бронирования
+          required: true
+          schema:
+            type: array
+            items:
+              type: integer
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookingInfo'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/BookingInfo'
+        '500':
+          description: Internal Server Error
+  /bookings/{bookingId}:
+    delete:
+      tags:
+        - bookings
+      summary: Отменить бронь
+      description: Метод для отмены брони по ее идентификатору
+      operationId: deleteBookingById
+      parameters:
+        - name: bookingId
+          in: path
+          description: Идентификатор бронирования
+          required: true
+          schema:
+            type: string
+            example: 123
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookDeleted'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/BookDeleted'
+        '404':
+          description: Бронь не найдена
+        '500':
+          description: Internal Server Error
+  /bookings/bonusAuditList:
+    get:
+      tags:
+        - bookings
+      summary: Получить отчет по бонусной программе
+      description: Получить отчет по бонусной программе. Метод возвращает отчет по бонусной программе за заданный период.
+      operationId: getBonusAuditList
+      parameters:
+        - name: startDate
+          in: query
+          description: Дата начала периода формирования отчета
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          description: Дата окончания периода формирования отчета
+          required: true
+          schema:
+            type: string
+            format: date    
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    description: Отчет по бонусной программе
+                    items: 
+                      $ref: '#/components/schemas/BonusAuditList'
+                  totalBookings:
+                    type: integer
+                    format: int64
+                    description: Общее количество бронирований за отчетный период
+                  totalBonusBooking:
+                    type: integer
+                    format: int64
+                    description: Общее количество бронирований с использованием бонусов за отчетный период
+                  frequencyBonusUse:
+                    type: string
+                    description: Частота использования бонусов, в процентах. Рассчитывается как процентное соотношение totalBonusBooking и frequencyBonusUse
+                    example: "20%"
+                  averageBonusPart:
+                    type: string
+                    description: Cредний показатель bonusPart для всех  бронирований с использованием бонусной программы (показывает какую часть стоимости билетов (%) клиенты оплачивают бонусными баллами)
+                    example: "10%"
+                  limit:
+                    type: integer
+                    format: int64
+                    description: Максимальное количество ответов на странице
+                    default: 50
+                  offset:
+                    type: integer
+                    format: int64
+                    description: Cмещение от начала списка ответов (для пагинации)
+                    default: 1
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/BonusAuditListXML'
+        '404':
+          description: Сведения для отчета не найдены
+        '500':
+          description: Internal Server Error  
+  /bookings/{bookingId}/pay:
+    post:
+      tags:
+        - bookings
+      summary: Оплатить бронирование
+      description: Метод для оплаты бронирования
+      operationId: payBookingById
+      parameters:
+        - name: bookingId
+          in: path
+          description: Идентификатор бронирования
+          required: true
+          schema:
+            type: string
+        - name: sBonusUsed
+          in: query
+          description: Признак применения бонусных баллов  для оплаты бронирования
+          required: true
+          schema:
+            type: boolean
+        - name: bonusAmount
+          in: query
+          description: Количество бонусных баллов, использованных при оплате заказа. Указывается при `isBonusUsed = true`
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/bookingsPayResponse'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/bookingsPayResponse'
+        '500':
+          description: Internal Server Error
+        '409':
+          description: Пользователь с таким номером тулефона уже зарегистрирован в бонусной программе
+  /bonusProgram/addUser:
+    post:
+      tags:
+        - bonusProgram
+      summary: Добавить участника бонусной программы
+      description: Метод для добавления участника бонусной программы
+      operationId: addBonusUser
+      parameters:
+        - name: customerInfo
+          in: query
+          description: Номер телефона участника бонусной программы
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/bonusProgramAddUserResponse'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/bonusProgramAddUserResponse'
+        '500':
+          description: Internal Server Error
+        '409':
+          description: Пользователь с таким номером тулефона уже зарегистрирован в бонусной программе
+  /bonusProgram/{bonusCardId}/decreaseBonusCount:
+    patch:
+      tags:
+        - bonusProgram
+      summary: Списать бонусные баллы со счета
+      description: Метод списывает бонусные баллы с бонусного счета пользователя после оплаты бронирования
+      operationId: decreaseBonusCount
+      parameters:
+        - name: bonusCardId
+          in: path
+          description: Идентификатор (номер) бонусной карты
+          required: true
+          schema:
+            type: string
+        - name: bonusAmount
+          in: query
+          description: Количество баллов для списания
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/decreaseBonusCountResponse'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/decreaseBonusCountResponse'
+        '404':
+          description: Бонусный счет не найден
+        '500':
+          description: Internal Server Error
+  /bonusProgram/{bonusCardId}/increaseBonusCount:
+    patch:
+      tags:
+        - bonusProgram
+      summary: Увеличить количество бонусных баллов на счету участника бонусной программы
+      description: Увеличить количество бонусных баллов на счету участника бонусной программы после оплаты бронирования. Метод добавляет бонусные баллы (10% от суммы оплаты) на бонусный счет после оплаты бронирования
+      operationId: increaseBonusCount
+      parameters:
+        - name: bonusCardId
+          in: path
+          description: Идентификатор (номер) бонусной карты
+          required: true
+          schema:
+            type: string
+        - name: bonusReward
+          in: query
+          description: Количество баллов для начисления на счет
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/increaseBonusCountResponse'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/increaseBonusCountResponse'
+        '404':
+          description: Бонусный счет не найден
+        '500':
+          description: Internal Server Error
+components:
+  schemas:
+    BonusAuditList:
+      type: object
+      properties:
+        bookingId:
+          type: integer
+          description: Идентификатор бронирования
+          format: int64
+        isBonusUsed:
+          type: boolean
+          description: Признак применения бонусных баллов  для оплаты бронирования
+        estimatedPrice:
+          type: string
+          description: Предварительная стоимость бронирования
+        totalPrice:
+          type: string
+          description: Итоговая стоимость бронирования  (с учетом применения бонусной программы). Вычисляется как estimatedPrice минус bonusAmount
+        bookDate:
+          type: string
+          format: date-time
+          description: Дата совершения покупки
+        bonusAmount:
+          type: string
+          description: Количество бонусных баллов, использованных при оплате заказа. Не может быть больше, чем estimatedPrice/2
+        bonusPart:
+          type: string
+          description: Часть стоимости билета (в процентах), которую покупатель оплатил бонусными баллами
+          example: "30%"
+        bonusReward:
+          type: string
+          description: Количество бонусных баллов для зачисления на бонусный счет (рассчитывается как totalPrice/10)
+    BonusAuditListXML:
+      type: object
+      properties:
+        items:
+          type: array
+          description: Бронирования
+          items: 
+            $ref: '#/components/schemas/BonusAuditList'
+        totalBookings:
+          type: integer
+          format: int64
+          description: Общее количество бронирований за отчетный период
+        totalBonusBooking:
+          type: integer
+          format: int64
+          description: общее количество бронирований с использованием бонусов за отчетный период
+        frequencyBonusUse:
+          type: string
+          description: Частота использования бонусов, в процентах. Рассчитывается как процентное соотношение totalBonusBooking и frequencyBonusUse
+        averageBonusPart:
+          type: string
+          description: Средний показатель bonusPart для всех  бронирований с использованием бонусной программы (показывает какую часть стоимости билетов (%) клиенты оплачивают бонусными баллами)
+        limit:
+          type: integer
+          format: int64
+          description: Максимальное количество ответов на странице
+          default: 50
+        offset:
+          type: integer
+          format: int64
+          description: Cмещение от начала списка
+          default: 1
+    bonusProgramAddUserResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Идентификатор участника бонусной программы
+          format: int64
+        customerInfo:
+          type: string
+          description: Номер телефона участника бонусной программы
+          example: "+79101234567" 
+        bonusCardId:
+          type: string
+          description: Идентификатор (номер) бонусной карты
+          format: int64
+          example: "1234567890"
+    decreaseBonusCountResponse:
+      type: object
+      properties:
+        bonusCardId:
+          type: string
+          description: Идентификатор (номер) бонусной карты
+          example: "1234567890"
+        bonusAmount:
+          type: string
+          description: Количество списанных баллов
+        bonusCount:
+          type: string
+          description: Количество бонусных баллов на счету после списания
+    bookingsPayResponse:
+      type: object
+      properties:
+        bookingId:
+          type: integer
+          description: Идентификатор бронирования
+          format: int64
+        isBonusUsed:
+          type: boolean
+          description: Признак применения бонусных баллов  для оплаты бронирования
+        estimatedPrice:
+          type: string
+          description: Предварительная стоимость бронирования
+        totalPrice:
+          type: string
+          description: Итоговая стоимость бронирования  (с учетом применения бонусной программы). Вычисляется как estimatedPrice минус bonusAmount
+        bookDate:
+          type: string
+          format: date-time
+          description: Дата совершения покупки
+        bonusAmount:
+          type: string
+          description: Количество бонусных баллов, использованных при оплате заказа. Не может быть больше, чем estimatedPrice/2
+        bonusPart:
+          type: string
+          description: Часть стоимости билета (в процентах), которую покупатель оплатил бонусными баллами
+          example: "30%"
+        bonusReward:
+          type: string
+          description: Количество бонусных баллов для зачисления на бонусный счет (рассчитывается как totalPrice/10)
+    BookingInfo:
+      type: object
+      properties:
+        bookingId:
+          type: integer
+          description: Идентификатор бронирования
+          format: int64
+        bookingStatus:
+          type: string
+          description: Cтатус бронирования
+          example: Оплачено 
+        scheduleId:
+          type: integer
+          description: Идентификатор сеанса
+          format: int64
+        title:
+          type: string
+          description: Название фильма
+          example: Рэмбо, первая кровь
+        description:
+          type: string
+          description: Описание фильма
+          example: Джон Рэмбо навалял всем
+        scheduleTime:
+          type: string
+          format: date-time
+          description: Дата и время сеанса
+        bookingSeats:
+          type: array
+          items:
+            type: integer
+          description: Массив номеров забронированных мест на сеанс
+          example: [1, 2]
+        totalPrice:
+          type: string
+          description: Стоимость бронирования
+    BookDeleted:
+      type: object
+      properties:
+        bookingId:
+          type: integer
+          description: Идентификатор бронирования
+          format: int64
+        bookingStatus:
+          type: string
+          description: Статус бронирования
+          example: Бронь отменена
+    increaseBonusCountResponse:
+      type: object
+      properties:
+        bonusCardId:
+          type: string
+          description: Идентификатор (номер) бонусной карты
+          example: "1234567890"
+        bonusReward:
+          type: string
+          description: Количество начисленных баллов
+        bonusCount:
+          type: string
+          description: Количество бонусных баллов на счету после пополнения
+    Schedule:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Идентификатор сеанса
+          format: int64
+        title:
+          type: string
+          description: Название фильма
+          example: Рэмбо, первая кровь
+        description:
+          type: string
+          description: Описание фильма
+          example: Джон Рэмбо навалял всем
+        seats:
+          type: array
+          items:
+            $ref: '#/components/schemas/Seat'
+        freeSeatsCount:
+          type: integer
+          format: int64
+          description: Количество свободных мест
+        scheduleTime:
+          type: string
+          format: date-time
+          description: Дата и время сеанса
+    ScheduleXML:
+      type: object
+      properties:
+        items:
+          type: array
+          description: Расписание
+          items: 
+            $ref: '#/components/schemas/Schedule'
+        itemsCount:
+          type: integer
+          format: int64
+          description: Количество сеансов в ответе
+        totalItemsCount:
+          type: integer
+          format: int64
+          description: Общее количество сеансов в расписании
+        offset:
+          type: integer
+          format: int64
+          description: Cмещение от начала списка сеансов
+    Seat:
+      type: object
+      properties:
+        seatsNumber:
+          type: integer
+          format: int64
+          description: Номер места
+        isFree:
+          type: boolean
+          description: Флаг доступности места
+        price:
+          type: string
+          description: Стоимость места
+      xml: 
+        name: Seat
+    SeatsXML:
+      type: object
+      properties:
+        freeSeatsCount:
+          type: integer
+          format: int64
+          description: Количество свободных мест
+        totalItemsCount:
+          type: integer
+          format: int64
+          description: Общее количество места в зале
+        offset:
+          type: integer
+          format: int64
+          description: Cмещение от начала списка мест
+        seats:
+          type: array
+          items:
+            $ref: '#/components/schemas/Seat'
+      xml: 
+        name: Seat
+    ScheduleInfo:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Идентификатор сеанса
+          format: int64
+        title:
+          type: string
+          description: Название фильма
+          example: Рэмбо, первая кровь
+        description:
+          type: string
+          description: Описание фильма
+          example: Джон Рэмбо навалял всем
+        scheduleTime:
+          type: string
+          format: date-time
+          description: Дата и время сеанса
