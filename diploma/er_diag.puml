@@ -1,0 +1,57 @@
+@startchen
+
+entity "Пользователь" as User {
+"Идентификатор" as id
+"Имя" as name
+"Отчество" as secondName
+"Фамилия" as surname
+"Логин" as login
+"Номер телефона" as phoneNumber
+"{Тариф}" as tarifInfo {
+ "Идентификатор\nтарифа" as tarifId
+"Дата\nподключения" as tarifBuyDate
+}
+"[Подключенные доп.опции]" as usedOptions {
+"Доп. опция" as option {
+ "Идентификатор\nопции" as optionId
+"Дата\nподключения" as optionBuyDate
+}
+}
+"Баланс" as balanse
+}
+
+entity "Тариф" as Tarif {
+"Идентификатор" as id
+"Название" as tarifName
+"Количество SMS" as SMS
+"Количество минут" as minutes
+"Количество гигабайт" as gigabytes
+"Стоимость" as tarifCost
+"Условия списания" as tarifPayRules
+}
+
+relationship "Использует" as BuyTarif {
+}
+
+User -N- BuyTarif
+BuyTarif -1- Tarif
+
+entity "Доп. опция" as Option {
+"Идентификатор" as id
+"Название" as optionName
+"Количество SMS" as SMS
+"Количество минут" as minutes
+"Количество гигабайт" as gigabytes
+"Стоимость" as optionCost
+"Условия списания" as optionPayRules
+}
+
+relationship "Использует" as BuyOptions {
+}
+
+User -N- BuyOptions
+BuyOptions -N- Option
+
+
+
+@endchen
