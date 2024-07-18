@@ -1,0 +1,44 @@
+@startgantt
+
+hide footbox
+
+projectscale monthly
+printscale weekly
+
+Project starts the 1th of january 2025
+
+[Исследование и анализ требований] as [TASK1] requires 65 days
+
+[Проектирование] starts D+65
+[Проектирование] requires 65 days
+
+[Разработка MVP] starts D+130
+[Разработка MVP] requires 60 days
+
+[Реализовать ЛК и регистрацию] starts D+130
+[Реализовать ЛК и регистрацию] requires 60 days
+
+[Функционал для записи на прием] starts D+130
+[Функционал для записи на прием] requires 60 days
+
+[Реализовать отмену записи] starts D+130
+[Реализовать отмену записи] requires 60 days
+
+
+[Запуск и эксплуатация MVP] starts D+190
+[Запуск и эксплуатация MVP] requires 65 days
+
+[Тестирование и отладка] starts D+190
+[Тестирование и отладка] requires 65 days
+
+[Сбор обратной связи] starts D+190
+[Сбор обратной связи] requires 200 days
+
+[Масштабирование и поддержка] starts D+190
+[Масштабирование и поддержка] requires 200 days
+
+[Раработка, тестирование и запуск улучшений и обновлений] starts D+190
+[Раработка, тестирование и запуск улучшений и обновлений] requires 200 days
+
+
+@endgantt

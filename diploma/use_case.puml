@@ -1,0 +1,53 @@
+@startuml
+
+left to right direction
+
+skinparam rectangle {
+    BorderColor black
+}
+
+:Неавторизованный\nпользователь: as Unauthorised
+:Пользователь: as User
+
+
+
+rectangle "Мой оператор связи" {
+    usecase (Авторизация пользователя) as Authorisation
+    usecase (Просмотр баланса) as WievBalanse
+    usecase (Получение информации\n о текущем тарифе) as WievUserTarif
+    usecase (Просмотр доступных тарифов) as WievTarifs
+    usecase (Смена тарифа) as ChangeTarif
+    usecase (Получение детальной\n информации о тарифе) as FullInfoTarif
+    usecase (Просмотр доступных опций) as WievOptins
+    usecase (Получение информации\n о подключенных опциях) as InfoOptions
+    usecase (Подключение опции) as AddOption
+    usecase (Отключение опции) as DeleteOption
+    usecase (Получение детальной\n информации об опции) as FullInfoOption
+    usecase (Загрузка PDF) as PDF
+}
+
+Unauthorised -- Authorisation
+
+
+User -left- WievBalanse
+User -left- WievUserTarif
+WievUserTarif <-- FullInfoTarif  #black;line.dashed;text:black : <<extends>>
+User -right- WievTarifs
+WievTarifs <-- FullInfoTarif  #black;line.dashed;text:black : <<extends>>
+ChangeTarif <-- FullInfoTarif  #black;line.dashed;text:black : <<extends>>
+User -- ChangeTarif
+User -- WievOptins
+
+FullInfoTarif --> PDF  #black;line.dashed;text:black : <<include>>
+FullInfoOption --> PDF  #black;line.dashed;text:black : <<include>>
+
+User -- InfoOptions
+InfoOptions <-- FullInfoOption  #black;line.dashed;text:black : <<extends>>
+WievOptins <-- FullInfoOption  #black;line.dashed;text:black : <<extends>>
+AddOption <-- FullInfoOption  #black;line.dashed;text:black : <<extends>>
+DeleteOption <-- FullInfoOption  #black;line.dashed;text:black : <<extends>>
+
+User -- AddOption
+User -- DeleteOption
+
+@enduml

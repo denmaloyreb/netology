@@ -11,7 +11,7 @@ BorderColor black
 :Модератор: as Moderator
 :Пользователь: as User
 
-rectangle  Сервис\nаренды {
+rectangle  Мой оператор\nсвязи {
 usecase (Заблокировать\nпользователя\nв сервисе) as BlockUser
 usecase (Выбрать\nпривязанную\nкарту) as ChooseCard
 usecase (Добавить\nсвой\nаватар) as AddAvatar
