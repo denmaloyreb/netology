@@ -12,7 +12,7 @@ entity "Пользователь" as User {
 "Дата\nподключения" as tarifBuyDate
 }
 "[Подключенные доп.опции]" as usedOptions {
-"Доп. опция" as option {
+"{Доп. опция}" as option {
  "Идентификатор\nопции" as optionId
 "Дата\nподключения" as optionBuyDate
 }
@@ -23,6 +23,7 @@ entity "Пользователь" as User {
 entity "Тариф" as Tarif {
 "Идентификатор" as id
 "Название" as tarifName
+"Описание" as tarifDescription
 "Количество SMS" as SMS
 "Количество минут" as minutes
 "Количество гигабайт" as gigabytes
@@ -39,6 +40,7 @@ BuyTarif -1- Tarif
 entity "Доп. опция" as Option {
 "Идентификатор" as id
 "Название" as optionName
+"Описание" as optionDescription
 "Количество SMS" as SMS
 "Количество минут" as minutes
 "Количество гигабайт" as gigabytes
