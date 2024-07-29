@@ -1,0 +1,390 @@
+openapi: 3.0.0
+info:
+  description: |
+    <b>API мобильного оператора «Мой оператор связи»</b>.</br>
+    API для реализации основных функций мобильного приложения для клиентов оператора. Пользователи приложения могут получать с помощью этого API актуальную информацию о балансе, подключенном тарифе, доступных тарифах и опциях, изменить текущий тариф, подключать и отключать опции. 
+  version: 1.0.0
+  title: «Мой оператор связи»
+  contact:
+    email: denmaloyreb@mail.ru
+servers:
+  - description: API мобильного оператора Auto Mocking
+    url: https://virtserver.swaggerhub.com/DENMALOYREB3/Mobile_operator/1.0.0
+tags:
+  - name: authorisation
+    description:  Методы для авторизации
+  - name: user
+    description: Методы для работы с тарифами и опциями пользователя
+  - name: tarif
+    description: Методы для работы с тарифами
+  - name: option
+    description: Методы для работы с опциями
+paths:
+  /tarif/list:
+    get:
+      tags:
+        - tarif
+      summary: Получить информацию о доступных тарифах
+      description: Метод возвращает информацию обо всех доступных для подключения тарифах
+      operationId: getTarifList
+      parameters:
+        - name: sortBy
+          in: query
+          description: Поле для сортировки
+          required: false
+          schema:
+            type: string
+            enum:
+            - tarifId
+            - tarifName
+            - tarifCost
+            - minutes
+            - sms
+            - gbs
+            default: tarifId
+        - name: sortDir
+          in: query
+          description: Направление сортировки
+          required: false
+          schema:
+            type: string
+            enum:
+            - ASC
+            - DESC
+            default: ASC
+        - name: limit
+          in: query
+          description: Количество тарифов на одной странице (для пагинации)
+          required: false
+          schema:
+            type: integer
+            default: 5
+        - name: offset
+          in: query
+          description: Cмещение от начала списка тарифов, доступных для подключения (для пагинации)
+          required: false
+          schema:
+            type: integer
+            default: 1
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    description: Список тарифов
+                    items: 
+                      $ref: '#/components/schemas/TarifsList'
+                  limit:
+                    type: integer
+                    format: int64
+                    description: Количество тарифов в ответе
+                    example: 5
+                  totalTarifCount:
+                    type: integer
+                    format: int64
+                    description: Общее количество тарифов, доступных для подключения
+                    example: 100
+                  offset:
+                    type: integer
+                    format: int64
+                    description: Cмещение от начала списка тарифов, доступных для подключения
+                    example: 1
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/TarifsListXML'
+        '404':
+          description: Список тарифов не найден
+        '500':
+          description: Internal Server Error
+  /option/{optionId}/detailedInfo:
+    get:
+      tags:
+        - option
+      summary: Получить детальную информацию об опции
+      description: Метод возвращает ссылку на скачивание PDF-файла с детальным описанием информации об опции
+      operationId: getOptionDetailedInfo
+      parameters:
+        - name: optionId
+          in: path
+          description: Идентификатор опции
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 123
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OptionDetailedInfoPdf'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/OptionDetailedInfoPdf'
+        '404':
+          description: Опция не найдена
+        '500':
+          description: Internal Server Error
+          
+  /user/{userId}/optionsListAdd:
+    patch:
+      tags:
+        - user
+      summary: Подключить опцию для пользователя
+      description: Метод для подключения опции для пользователя. Добавляет новую опцию в список опций, подключенных для пользователя
+      operationId: addOptionFromUser
+      parameters:
+        - name: userId
+          in: path
+          description: Идентификатор клиента
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 123
+        - name: optionId
+          in: query
+          description: Идентификатор подключаемой опции
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 123
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OptionsListAddResponse'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/OptionsListAddResponse'
+        '404':
+          description: Опция не найдена
+        '403':
+          description: Недостаточно средств на счету
+        '500':
+          description: Internal Server Error
+  /user/{phoneNumber}/authCode:
+    post:
+      tags:
+        - authorisation
+      summary: Получить SMS-код авторизации
+      description: Метод для получения кода авторизации по номеру телефона пользователя. Если пользователь с указанным номером телефона не зарегистрирован, метод возвращает ошибку  с кодом 404 и текстом «Пользователь не зарегистрирован в системе».
+      operationId: getSmsCode
+      parameters:
+        - name: phoneNumber
+          in: path
+          description: Номер телефона пользователя
+          required: true
+          schema:
+            type: string
+          example: 71234567890
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthCodeSmsResponse'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/AuthCodeSmsResponse'
+        '500':
+          description: Internal Server Error
+        '404':
+          description: Пользователь не найден
+  /user/{userId}/optionsListDelete:
+    delete:
+      tags:
+        - user
+      summary: Отключить опцию для пользователя
+      description: Метод отключает указанную опцию для пользователя
+      operationId: deleteOptionById
+      parameters:
+        - name: userId
+          in: path
+          description: Идентификатор клиента
+          required: true
+          schema:
+            type: string
+            example: 123
+        - name: userId
+          in: query
+          description: Идентификатор отключаемой опции
+          required: true
+          schema:
+            type: string
+            example: 123
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OptionDeleted'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/OptionDeleted'
+        '404':
+          description: Бронь не найдена
+        '500':
+          description: Internal Server Error
+
+components:
+  schemas:
+    AuthCodeSmsResponse:
+      type: object
+      properties:
+        userId:
+          type: integer
+          description: Идентификатор пользователя
+          format: int64
+          example: 123
+        phoneNumber:
+          type: string
+          description: Номер телефона пользователя
+          example: 71234567890 
+        smsCode:
+          type: integer
+          description: Код авторизации
+          format: int64
+          example: 1234
+        codeDuration:
+          type: string
+          format: date-time
+          description: Время истечения срока действия кода. Рассчитывается как текущее время + 3 минуты
+    OptionDeleted:
+      type: object
+      properties:
+        userId:
+          type: integer
+          description: Идентификатор клиента
+          format: int64
+          example: 123
+        optionId:
+          type: integer
+          description: Идентификатор отключенной опции
+          format: int64
+          example: 123
+        optionIdName:
+          type: string
+          description: Название опции
+          example: Опция «Нелюбимая»
+        deleteOptionDate:
+          type: string
+          format: date-time
+          description: Дата и время отключения опции = текущее время и дата
+    OptionDetailedInfoPdf:
+      type: object
+      properties:
+        optionId:
+          type: integer
+          description: Идентификатор опции
+          format: int64
+          example: 123
+        detailedInfoUrl:
+          type: string
+          description: Ссылка на PDF-файл с детальным описанием информации об опции
+          example: https://file.pdf 
+    TarifsList:
+      type: object
+      properties:
+        tarifId:
+          type: integer
+          description: Идентификатор тарифного плана
+          format: int64
+          example: 123
+        tarifName:
+          type: string
+          description: Название тарифного плана
+          example: Тариф «Лучший»
+        tarifCost:
+          type: integer
+          format: int64
+          description: Стоимость тарифного плана (в копейках)
+          example: 10000
+        minutes:
+          type: integer
+          format: int64
+          description: Количество минут, предоставляемых в рамках тарифного плана
+          example: 60
+        sms:
+          type: integer
+          format: int64
+          description: Количество SMS, предоставляемых в рамках тарифного плана
+          example: 100
+        gbs:
+          type: integer
+          format: int64
+          description: Количество гигабайт, предоставляемых в рамках тарифного плана
+          example: 1
+        conditions:
+          type: integer
+          format: int64
+          description: Условия списания. Указывается число месяца, когда происходит списание
+          example: 25
+    TarifsListXML:
+      type: object
+      properties:
+        items:
+          type: array
+          description: Расписание
+          items: 
+            $ref: '#/components/schemas/TarifsList'
+        limit:
+          type: integer
+          format: int64
+          description: Количество тарифов в ответе
+          example: 5
+        totalTarifCount:
+          type: integer
+          format: int64
+          description: Общее количество доступных для подключения тарифов
+          example: 100
+        offset:
+          type: integer
+          format: int64
+          description: Cмещение от начала списка тарифов, доступных для подключения
+          example: 1
+    OptionsListAddResponse:
+      type: object
+      properties:
+        userId:
+          type: integer
+          description: Идентификатор клиента
+          format: int64
+        optionId:
+          type: integer
+          format: int64
+          description: Идентификатор подключенной опции
+          example: 123
+        optionIdName:
+          type: string
+          description: Название опции
+          example: Опция «Много гигов»
+        conditions:
+          type: integer
+          format: int64
+          description: Условия списания. Указывается число месяца, когда происходит списание
+          example: 25
+        upcomingOptionAmount:
+          type: integer
+          format: int64
+          description: Сумма следующего списания за опцию
+          example: 25
+        addOptionDate:
+          type: string
+          format: date-time
+          description: Дата и время подключения опции = текущее время и дата
+        upcomingAmountDate:
+          type: string
+          format: date-time
+          description: Дата следующего списания средств за опцию
